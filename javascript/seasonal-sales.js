@@ -3,79 +3,53 @@ var departmentsContainer = document.getElementById("departmentsContainer");
 var productArray = [];
 var departmentArray = [];
 
+///////////////////////////////////////////PRODUCTS
 
-//////////////////////PRODUCTS
+function sendProductsToDom(xhrData){
+	// var productsString = "";
 
-// function sendProductsToDom(xhrData){
-// 	var productsString = "";
-// 	for (var i=0; i<productArray.length; i++) {
-// 		productArray += `<div class="row">`;
-//   		productArray += `<div class="col-sm-6 col-md-4">`;
-//     	productArray += `<div class="caption">`;
-//         productArray += `<h3>Sale Item</h3>`;//name
-//         productArray += `<p> ${productArray[i].price}</p>`;//price
-//         productArray += `<p> ${productArray[i].catagories.name}</p>`;//department
-//       	productArray += `</div></div></div>`;
 
-// 	}
-
-// }
-
+	productArray.forEach(function(products){
+		for (var i=0; i<departmentArray.length; i++) {
+			console.log(products.category_id);
+			console.log(departmentArray[i].id);
+			if (products.category_id === departmentArray[i].id) {
+				products["category_name"] = departmentArray[i].name;
+				products["categorySeasonDiscount"] = departmentArray[i].season_discount;
+				products["category_discount"] = departmentArray[i].discount;
+				products["season_price"] = (productArray.price * (1.00 - departmentArray[i].discount)).toFixed(2);
+			}
+		}
+	})
+	console.log(productArray);
+};
 
 function executeSalesAfterFileIsLoaded(){
 	var data = JSON.parse(this.responseText);
-	// sendProductsToDom(data);
 
-	for(var i=0; i<data.products.length; i++){
-	productArray.push(data.products[i])
+		for(var i=0; i<data.products.length; i++){
+		productArray.push(data.products[i])
+	}
+	console.log(productArray);
+sendProductsToDom(data);
 };
 
-dataHandler(data);
-}
 
-function dataHandler(productsxhr) {
-	productArray.forEach(function(products){
-		for (var i = 0; i<departmentArray.length; i++) {
-			departmentArray[i]
-			if (products)
-		}
-	})
-}
 
 function executeThisCodeAfterFileFails(){
 	alert("Sale is Unavailable");
 }
 
 
-
-
-
-
-//////////////////////DEPARTMENTS
-
-function sendDepartmentsToDom(xhrData){
-	var categoriesString = "";
-	for(var j = 0; j<categories.length; j++) {
-
-
-	}
-	// console.log("working");
-}
-
-
-
-
-// from inside the function that creates the department array, 
-// call the request for the products JSON, and call a function to create the products array
-
-
+/////////////////////////////////////////DEPARTMENTS
 
 function executeDepartmentsAfterFileIsLoaded(){
 	var data = JSON.parse(this.responseText);
+	console.log(data);
 	// sendDepartmentsToDom(data);
 
 		for(var i=0; i<data.categories.length; i++){
-	departmentArray.push(data.categories[i])
+		departmentArray.push(data.categories[i])
 }
 
 	var myRequestProducts = new XMLHttpRequest();
@@ -96,13 +70,4 @@ myRequestDepartments.addEventListener("load", executeDepartmentsAfterFileIsLoade
 myRequestDepartments.addEventListener("error", executeThisCodeAfterFileFails);
 myRequestDepartments.open("GET", "departments.json");
 myRequestDepartments.send();
-
-
-
-
-
-
-
-
-
 
