@@ -5,39 +5,38 @@ var departmentArray = [];
 var productsString = "";
 ///////////////////////////////////////////PRODUCTS
 
-function dataHandler(data){
+function dataHandler(){
 	
-	products = data.products;
-	productArray.forEach(function(products){
+	productArray.forEach(function(product){
+
 		for (var i=0; i<departmentArray.length; i++) {
-			console.log(products.category_id);
-			console.log(departmentArray[i].id);
-			if (products.category_id === departmentArray[i].id) {
-				products["category_name"] = departmentArray[i].name;
-				products["categorySeasonDiscount"] = departmentArray[i].season_discount;
-				products["category_discount"] = departmentArray[i].discount;
-				products["season_price"] = (productArray.price * (1.00 - departmentArray[i].discount)).toFixed(2);
+			if (product.category_id === departmentArray[i].id) {
+				product["category_name"] = departmentArray[i].name;
+				product["categorySeasonDiscount"] = departmentArray[i].season_discount;
+				product["category_discount"] = departmentArray[i].discount;
+				product["season_price"] = (product.price - (product.price * departmentArray[i].discount));
 			}
 		}
 	})
-	writeToDom();
+	writeToDom("none");
 };
 
 function writeToDom(season){
+
 	var productBuilder ="";
 	for (var i = 0; i < productArray.length; i++) {
 		productBuilder += `<div class="row">`
-		productBuilder += `<div class="col-sm-9 col-md-6"><h3>${products[i].name}</h3>`
+		productBuilder += `<div class="col-sm-9 col-md-6 name"><h3>${productArray[i].name}</h3>`
 		if (season === productArray[i].categorySeasonDiscount) {
-			productBuilder += `<div class="row"> <div class="col-xs-8 col-sm-6"><h4>${products[i]["season-price"]}</h4></div>`
+			productBuilder += `<div class="row price"> <div class="col-xs-8 col-sm-6"><h4>${productArray[i]["season_price"].toFixed(2)}</h4></div>`
 		} else {
-			productBuilder += `<div class="row"> <div class="col-xs-8 col-sm-6"><h4>${products[i].price}</h4></div>`
+			productBuilder += `<div class="row price"> <div class="col-xs-8 col-sm-6"><h4>${productArray[i].price}</h4></div>`
 
 		}
-		productBuilder += `<div class="col-xs-4 col-sm-6"><h4>${products[i].categorySeasonDiscount}</h4></div>`
+		productBuilder += `<div class="col-xs-4 col-sm-6 category_name"><h4>${productArray[i].category_name}</h4></div>`
 		productBuilder += `</div></div></div>`
 		productsContainer.innerHTML = productBuilder
-
+	}
 }
 
 var dropDown = document.getElementById("chooseSeason");
@@ -49,19 +48,15 @@ dropDown.addEventListener("change", function(e){
 
 
 function executeParseProducts(){
-	var data = JSON.parse(this.responseText);
+	var data = JSON.parse(this.responseText).products;
+	productArray = data;
 
-		for(var i=0; i<data.products.length; i++){
-		productArray.push(data.products[i])
-	}
-	// console.log(productArray);
-dataHandler(data);
+	dataHandler();
 }
 
 function executeDepartmentsAfterFileIsLoaded(){
-	var data = JSON.parse(this.responseText);
-	// console.log(data);
-	}
+	var data = JSON.parse(this.responseText).categories;
+	departmentArray = data;
 }
 
 function executeThisCodeAfterFileFails(){
@@ -69,7 +64,11 @@ function executeThisCodeAfterFileFails(){
 }
 
 
-
+var myRequestDepartments = new XMLHttpRequest();
+myRequestDepartments.addEventListener("load", executeDepartmentsAfterFileIsLoaded);
+myRequestDepartments.addEventListener("error", executeThisCodeAfterFileFails);
+myRequestDepartments.open("GET", "departments.json");
+myRequestDepartments.send();
 
 var myRequestProducts = new XMLHttpRequest();
 myRequestProducts.addEventListener("load", executeParseProducts);
@@ -77,11 +76,7 @@ myRequestProducts.addEventListener("error", executeThisCodeAfterFileFails);
 myRequestProducts.open("GET", "products.json");
 myRequestProducts.send();
 
-var myRequestDepartments = new XMLHttpRequest();
-myRequestDepartments.addEventListener("load", executeDepartmentsAfterFileIsLoaded);
-myRequestDepartments.addEventListener("error", executeThisCodeAfterFileFails);
-myRequestDepartments.open("GET", "departments.json");
-myRequestDepartments.send();
+
 
 
 
